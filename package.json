@@ -13,10 +13,25 @@
         "autoprefixer": "^10.4.12",
         "axios": "^1.1.2",
         "laravel-vite-plugin": "^0.8.0",
-        "postcss": "^8.4.18",
+        "postcss": "^8.4.31",
+        "postcss-preset-mantine": "^1.9.0",
+        "postcss-simple-vars": "^7.0.1",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "tailwindcss": "^3.2.1",
         "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "@mantine/carousel": "^7.1.7",
+        "@mantine/core": "^7.1.7",
+        "@mantine/dates": "^7.1.7",
+        "@mantine/dropzone": "^7.1.7",
+        "@mantine/form": "^7.1.7",
+        "@mantine/hooks": "^7.1.7",
+        "@mantine/modals": "^7.1.7",
+        "@mantine/notifications": "^7.1.7",
+        "@mantine/nprogress": "^7.1.7",
+        "dayjs": "^1.11.10",
+        "embla-carousel-react": "^7.1.0"
     }
 }
