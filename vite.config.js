@@ -25,5 +25,6 @@ export default defineConfig({
             key: fs.readFileSync(env.VITE_PRIVKEY_PATH),
             cert: fs.readFileSync(env.VITE_CERT_PATH),
         },
+        cors: true,
     },
 });
