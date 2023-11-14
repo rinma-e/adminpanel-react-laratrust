@@ -1,8 +1,5 @@
 import "./bootstrap";
 import "../css/app.css";
-import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
-import "@mantine/dropzone/styles.css";
 
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
