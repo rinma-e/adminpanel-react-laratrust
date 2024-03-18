@@ -31,6 +31,7 @@ export default function PrimaryColorChanger({ ...props }) {
                 light: shade,
                 dark: shade + 1 > 9 ? 9 : shade + 1,
             });
+            setOpened(false);
         },
         [setPrimaryColor, setPrimaryColorShade]
     );
@@ -97,7 +98,7 @@ export default function PrimaryColorChanger({ ...props }) {
                             primaryColorShade[colorScheme]
                         ]
                     }
-                    onClick={() => setOpened((o) => !o)}
+                    onClick={() => setOpened(true)}
                     size={22}
                     style={{ display: "block", cursor: "pointer" }}
                 >
