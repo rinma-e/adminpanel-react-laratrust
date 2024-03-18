@@ -85,7 +85,10 @@ export default function PrimaryColorChanger({ ...props }) {
         <Popover
             {...props}
             opened={opened}
-            onClose={() => setOpened(false)}
+            onClose={() => {
+                props.onClose();
+                setOpened(false);
+            }}
             position="bottom-end"
             withArrow
         >
