@@ -1,4 +1,11 @@
-import { useState, useCallback, useMemo } from "react";
+import {
+    useState,
+    useCallback,
+    useMemo,
+    forwardRef,
+    useRef,
+    useEffect,
+} from "react";
 import { IconColorPicker } from "@tabler/icons-react";
 import {
     useMantineColorScheme,
@@ -10,10 +17,11 @@ import {
     rem,
     SimpleGrid,
     Tooltip,
+    ScrollArea,
 } from "@mantine/core";
 import { useColor } from "@/Context/PrimaryColorProviderContext";
 
-export default function PrimaryColorChanger({ ...props }) {
+const PrimaryColorChanger = forwardRef((props, ref) => {
     const [opened, setOpened] = useState(false);
     const { colorScheme } = useMantineColorScheme();
     const theme = useMantineTheme();
@@ -81,19 +89,55 @@ export default function PrimaryColorChanger({ ...props }) {
         handleClick,
     ]);
 
+    const onCloseHandler = useCallback(() => {
+        if (typeof props.onClose === "function") {
+            props.onClose(); // Call the passed onClose function
+        }
+        setOpened(false);
+    });
+
+    const simpleGridRef = useRef();
+    const [distanceFromTop, setDistanceFromTop] = useState(0);
+    const [scrollAreaHeight, setScrollAreaHeight] = useState("100vh");
+
+    useEffect(() => {
+        const updateDistanceFromTop = () => {
+            if (simpleGridRef.current) {
+                const rect = simpleGridRef.current.getBoundingClientRect();
+                setDistanceFromTop(rect.top + window.scrollY);
+
+                // Calculate and set the ScrollArea height
+                setScrollAreaHeight(
+                    `calc(100vh - ${distanceFromTop}px - 120px)`
+                );
+            }
+        };
+
+        // Update the distance when the component mounts
+        updateDistanceFromTop();
+
+        // Update the distance on window resize and scroll events
+        window.addEventListener("resize", updateDistanceFromTop);
+        window.addEventListener("scroll", updateDistanceFromTop);
+
+        // Cleanup event listeners on component unmount
+        return () => {
+            window.removeEventListener("resize", updateDistanceFromTop);
+            window.removeEventListener("scroll", updateDistanceFromTop);
+        };
+    });
+
     return (
         <Popover
             {...props}
             opened={opened}
-            onClose={() => {
-                props.onClose();
-                setOpened(false);
-            }}
+            onClose={onCloseHandler}
             position="bottom-end"
             withArrow
         >
             <Popover.Target>
                 <ColorSwatch
+                    ref={ref}
                     component="button"
                     type="button"
                     color={
@@ -101,21 +145,26 @@ export default function PrimaryColorChanger({ ...props }) {
                             primaryColorShade[colorScheme]
                         ]
                     }
-                    onClick={() => setOpened(true)}
+                    onClick={() => setOpened((o) => !o)}
                     size={22}
                     style={{ display: "block", cursor: "pointer" }}
                 >
                     <IconColorPicker
+                        ref={simpleGridRef}
                         style={{ width: rem(14), height: rem(14) }}
                         color="#fff"
                     />
                 </ColorSwatch>
             </Popover.Target>
             <Popover.Dropdown>
-                <SimpleGrid cols={10} gap="xs">
-                    {swatches}
-                </SimpleGrid>
+                <ScrollArea.Autosize type="always" mah={scrollAreaHeight}>
+                    <SimpleGrid cols={10} gap="xs">
+                        {swatches}
+                    </SimpleGrid>
+                </ScrollArea.Autosize>
             </Popover.Dropdown>
         </Popover>
     );
-}
+});
+
+export default PrimaryColorChanger;
