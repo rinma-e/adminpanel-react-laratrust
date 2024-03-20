@@ -103,8 +103,9 @@ const PrimaryColorChanger = forwardRef((props, ref) => {
     useEffect(() => {
         const updateDistanceFromTop = () => {
             if (simpleGridRef.current) {
+                // Get the distance from the top
                 const rect = simpleGridRef.current.getBoundingClientRect();
-                setDistanceFromTop(rect.top + window.scrollY);
+                setDistanceFromTop(rect.top);
 
                 // Calculate and set the ScrollArea height
                 setScrollAreaHeight(
