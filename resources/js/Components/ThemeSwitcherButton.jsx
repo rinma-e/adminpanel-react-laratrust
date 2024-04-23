@@ -15,11 +15,11 @@ export default function ThemeSwitcherButton({
     ...props
 }) {
     const iconSizes = {
-        xs: rem(12),
-        sm: rem(14),
-        md: rem(16),
-        lg: rem(20),
-        xl: rem(26),
+        xs: 12,
+        sm: 14,
+        md: 16,
+        lg: 20,
+        xl: 26,
     };
 
     size = size && size in iconSizes ? size : "md";
@@ -31,7 +31,7 @@ export default function ThemeSwitcherButton({
 
     const sunIcon = (
         <IconSun
-            style={{ width: iconSizes[size], height: iconSizes[size] }}
+            size={iconSizes[size]}
             stroke={2.5}
             color={theme.colors.yellow[4]}
         />
@@ -39,7 +39,7 @@ export default function ThemeSwitcherButton({
 
     const moonIcon = (
         <IconMoonStars
-            style={{ width: iconSizes[size], height: iconSizes[size] }}
+            size={iconSizes[size]}
             stroke={2}
             color={theme.colors.blue[6]}
         />

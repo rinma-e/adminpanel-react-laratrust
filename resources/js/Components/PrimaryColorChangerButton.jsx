@@ -14,7 +14,6 @@ import {
     Popover,
     UnstyledButton,
     CheckIcon,
-    rem,
     SimpleGrid,
     Tooltip,
     ScrollArea,
@@ -63,7 +62,7 @@ const PrimaryColorChanger = forwardRef((props, ref) => {
                         >
                             {theme.primaryColor === color &&
                                 theme.primaryShade.light === i && (
-                                    <CheckIcon width={10} />
+                                    <CheckIcon size={10} />
                                 )}
                         </ColorSwatch>
                     </Tooltip>
@@ -76,7 +75,7 @@ const PrimaryColorChanger = forwardRef((props, ref) => {
                     >
                         {theme.primaryColor === color &&
                             theme.primaryShade.light === i && (
-                                <CheckIcon width={10} />
+                                <CheckIcon size={10} />
                             )}
                     </ColorSwatch>
                 );
@@ -152,13 +151,13 @@ const PrimaryColorChanger = forwardRef((props, ref) => {
                 >
                     <IconColorPicker
                         ref={simpleGridRef}
-                        style={{ width: rem(14), height: rem(14) }}
+                        size={14}
                         color="#fff"
                     />
                 </ColorSwatch>
             </Popover.Target>
             <Popover.Dropdown>
-                <ScrollArea.Autosize type="always" mah={scrollAreaHeight}>
+                <ScrollArea.Autosize type="auto" mah={scrollAreaHeight}>
                     <SimpleGrid cols={10} gap="xs">
                         {swatches}
                     </SimpleGrid>
