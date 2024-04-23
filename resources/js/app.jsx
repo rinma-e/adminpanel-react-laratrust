@@ -15,6 +15,9 @@ const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
 const theme = createTheme({
     fontFamily: "Poppins, sans-serif",
+    breakpoints: {
+        xxl: "102em",
+    },
 });
 
 function MyApp({ App, props }) {
