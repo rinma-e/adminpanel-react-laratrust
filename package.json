@@ -41,6 +41,8 @@
         "@tiptap/starter-kit": "^2.1.12",
         "dayjs": "^1.11.10",
         "embla-carousel-react": "^7.1.0",
-        "postcss-import": "^15.1.0"
+        "mantine-form-zod-resolver": "^1.1.0",
+        "postcss-import": "^15.1.0",
+        "zod": "^3.22.4"
     }
 }
