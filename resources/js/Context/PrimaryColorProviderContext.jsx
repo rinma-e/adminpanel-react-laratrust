@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import { useLocalStorage } from "@mantine/hooks";
 
 const PrimaryColorProviderContext = createContext(null);
 
@@ -7,18 +8,28 @@ export const useColor = () => {
     return useContext(PrimaryColorProviderContext);
 };
 
-export const PrimaryColorProvider = ({
-    children,
-    primaryColor,
-    setPrimaryColor,
-    primaryColorShade,
-    setPrimaryColorShade,
-}) => {
+export const PrimaryColorProvider = ({ children }) => {
+    const [primaryColor, setPrimaryColor, removePrimaryColor] = useLocalStorage(
+        {
+            key: "primary-color",
+            defaultValue: "blue",
+            getInitialValueInEffect: false,
+        }
+    );
+    const [primaryColorShade, setPrimaryColorShade, removePrimaryColorShade] =
+        useLocalStorage({
+            key: "primary-color-shade",
+            defaultValue: { light: 6, dark: 7 },
+            getInitialValueInEffect: false,
+        });
+
     const value = {
-        primaryColor: primaryColor,
-        setPrimaryColor: setPrimaryColor,
-        primaryColorShade: primaryColorShade,
-        setPrimaryColorShade: setPrimaryColorShade,
+        primaryColor,
+        setPrimaryColor,
+        removePrimaryColor,
+        primaryColorShade,
+        setPrimaryColorShade,
+        removePrimaryColorShade,
     };
 
     return (

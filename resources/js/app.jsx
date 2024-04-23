@@ -6,8 +6,10 @@ import { StrictMode } from "react";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { MantineProvider, createTheme } from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
-import { PrimaryColorProvider } from "./Context/PrimaryColorProviderContext";
+import {
+    PrimaryColorProvider,
+    useColor,
+} from "./Context/PrimaryColorProviderContext";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -15,17 +17,9 @@ const theme = createTheme({
     fontFamily: "Poppins, sans-serif",
 });
 
-function MyApp({ el, App, props }) {
-    const [primaryColor, setPrimaryColor] = useLocalStorage({
-        key: "primary-color",
-        defaultValue: "blue",
-        getInitialValueInEffect: false,
-    });
-    const [primaryColorShade, setPrimaryColorShade] = useLocalStorage({
-        key: "primary-color-shade",
-        defaultValue: { light: 6, dark: 7 },
-        getInitialValueInEffect: false,
-    });
+function MyApp({ App, props }) {
+    const { primaryColor, primaryColorShade } = useColor();
+
     return (
         <StrictMode>
             <MantineProvider
@@ -37,14 +31,7 @@ function MyApp({ el, App, props }) {
                 withNormalizeCSS
                 withGlobalStyles
             >
-                <PrimaryColorProvider
-                    primaryColor={primaryColor}
-                    setPrimaryColor={setPrimaryColor}
-                    primaryColorShade={primaryColorShade}
-                    setPrimaryColorShade={setPrimaryColorShade}
-                >
-                    <App {...props} />
-                </PrimaryColorProvider>
+                <App {...props} />
             </MantineProvider>
         </StrictMode>
     );
@@ -60,7 +47,11 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(<MyApp el={el} App={App} props={props} />);
+        root.render(
+            <PrimaryColorProvider>
+                <MyApp App={App} props={props} />
+            </PrimaryColorProvider>
+        );
     },
     progress: {
         color: "#4B5563",
