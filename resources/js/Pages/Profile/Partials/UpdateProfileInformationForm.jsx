@@ -1,103 +1,212 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Link, useForm, usePage } from '@inertiajs/react';
-import { Transition } from '@headlessui/react';
+import { useState, useEffect } from "react";
+import { Link, usePage, router } from "@inertiajs/react";
+import { useForm as useMantineForm } from "@mantine/form";
+import {
+    Text,
+    TextInput,
+    Button,
+    Anchor,
+    Group,
+    Stack,
+    Grid,
+    Notification,
+    rem,
+} from "@mantine/core";
+import {
+    IconDeviceFloppy,
+    IconAlertTriangle,
+    IconInfoCircle,
+    IconUserCog,
+} from "@tabler/icons-react";
+import { zodResolver } from "mantine-form-zod-resolver";
 
-export default function UpdateProfileInformation({ mustVerifyEmail, status, className = '' }) {
+import { validationSchema } from "@/Pages/Auth/validationSchema";
+
+export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
     const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
-        name: user.name,
-        email: user.email,
+    const [disableSubmitButton, setDisableSubmitButton] = useState(true);
+
+    const emailVerified = mustVerifyEmail && user.email_verified_at === null;
+
+    const form = useMantineForm({
+        initialValues: {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+        },
+        initialErrors: {
+            email: emailVerified ? "Your email address is unverified" : null,
+        },
+
+        validate: zodResolver(validationSchema),
     });
 
-    const submit = (e) => {
-        e.preventDefault();
+    // check did data change from initial values on every value change and set disable submit button to true or false
+    useEffect(() => {
+        form.isDirty() // if data to change from initial values isDirty is true
+            ? setDisableSubmitButton(false)
+            : setDisableSubmitButton(true);
+    }, [form.values]); // make sure to run it on every value change
 
-        patch(route('profile.update'));
+    const handleSubmit = (data) => {
+        // send avatar only if it is an object (file object if picture is selected or null object if user remove existing picture)
+        typeof data.avatar !== "object" && delete data.avatar;
+
+        router.post(route("profile.update"), data, {
+            preserveScroll: true,
+            preserveState: (page) => Object.keys(page.props.errors).length,
+            onProgress: () => setDisableSubmitButton(true),
+            onSuccess: () => {
+                form.reset();
+            },
+            onFinish: () => setDisableSubmitButton(true),
+            onError: (err) => {
+                // set server side errors in form
+                form.setErrors({ ...err });
+            },
+        });
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Profile Information</h2>
-
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Update your account's profile information and email address.
-                </p>
-            </header>
-
-            <form onSubmit={submit} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
-                    <TextInput
-                        id="name"
-                        className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        isFocused
-                        autoComplete="name"
-                    />
-
-                    <InputError className="mt-2" message={errors.name} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                        autoComplete="username"
-                    />
-
-                    <InputError className="mt-2" message={errors.email} />
-                </div>
-
-                {mustVerifyEmail && user.email_verified_at === null && (
-                    <div>
-                        <p className="text-sm mt-2 text-gray-800 dark:text-gray-200">
-                            Your email address is unverified.
-                            <Link
-                                href={route('verification.send')}
-                                method="post"
-                                as="button"
-                                className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                            >
-                                Click here to re-send the verification email.
-                            </Link>
-                        </p>
-
-                        {status === 'verification-link-sent' && (
-                            <div className="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
-                                A new verification link has been sent to your email address.
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
+        <Stack>
+            {emailVerified && status !== "verification-link-sent" && (
+                <Notification
+                    icon={<IconAlertTriangle color="orange" />}
+                    color="transparent"
+                    withBorder
+                    withCloseButton={false}
+                    mb="lg"
+                >
+                    <Text size="sm">Your email address is unverified</Text>
+                    <Anchor
+                        component={Link}
+                        href={route("verification.send")}
+                        size="sm"
+                        method="post"
+                        as="button"
+                        mt="xs"
+                        ta="left"
+                        fw={500}
                     >
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Saved.</p>
-                    </Transition>
-                </div>
+                        Click here to re-send the verification email.
+                    </Anchor>
+                </Notification>
+            )}
+
+            {emailVerified && status === "verification-link-sent" && (
+                <Notification
+                    icon={
+                        <IconInfoCircle color="var(--mantine-color-green-6)" />
+                    }
+                    color="transparent"
+                    withBorder
+                    onClose={(e) =>
+                        (e.target.closest(
+                            ".mantine-Notification-root"
+                        ).style.display = "none")
+                    }
+                    mb="lg"
+                >
+                    <Text c="var(--mantine-color-green-6)" size="sm">
+                        A new verification link has been sent to your email
+                        address.
+                    </Text>
+                </Notification>
+            )}
+
+            {status === "profile-updated" && (
+                <Notification
+                    icon={
+                        <IconInfoCircle color="var(--mantine-color-green-6)" />
+                    }
+                    color="transparent"
+                    withBorder
+                    onClose={(e) =>
+                        (e.target.closest(
+                            ".mantine-Notification-root"
+                        ).style.display = "none")
+                    }
+                    mb="lg"
+                >
+                    <Text c="var(--mantine-color-green-6)" size="sm">
+                        Profile has been successfully updated.
+                    </Text>
+                </Notification>
+            )}
+
+            <form onSubmit={form.onSubmit(handleSubmit)}>
+                <Grid gutter={rem(20)} mx="auto">
+                    <Grid.Col
+                        span={{ base: 12, xs: "content" }}
+                        align="center"
+                        mx="auto"
+                    >
+                        <IconUserCog
+                            size={100}
+                            stroke={0.5}
+                            color={"var(--mantine-color-dimmed)"}
+                            style={{
+                                marginLeft: rem(-15),
+                                marginTop: rem(-10),
+                            }}
+                        />
+                    </Grid.Col>
+
+                    <Grid.Col
+                        span={{ base: 12, xs: "auto" }}
+                        miw={rem(180)}
+                        mx="auto"
+                        align="left"
+                    >
+                        <TextInput
+                            label="First Name"
+                            name="first_name"
+                            autoComplete="given-name"
+                            mb="md"
+                            size="sm"
+                            withAsterisk={false}
+                            required
+                            {...form.getInputProps("first_name")}
+                        />
+
+                        <TextInput
+                            label="Last Name"
+                            name="last_name"
+                            autoComplete="family-name"
+                            mb="md"
+                            size="sm"
+                            withAsterisk={false}
+                            required
+                            {...form.getInputProps("last_name")}
+                        />
+
+                        <TextInput
+                            label="Email"
+                            name="email"
+                            autoComplete="email"
+                            mb="xl"
+                            size="sm"
+                            withAsterisk={false}
+                            required
+                            disabled={emailVerified ? true : false}
+                            {...form.getInputProps("email")}
+                        />
+
+                        <Group justify="flex-end">
+                            <Button
+                                type="submit"
+                                disabled={disableSubmitButton}
+                                leftSection={
+                                    <IconDeviceFloppy size={16} stroke={2.5} />
+                                }
+                            >
+                                Save
+                            </Button>
+                        </Group>
+                    </Grid.Col>
+                </Grid>
             </form>
-        </section>
+        </Stack>
     );
 }
