@@ -1,157 +1,182 @@
-import { Head } from "@inertiajs/react";
-import { useEffect } from "react";
-import ThemeSwitcherButton from "@/Components/ThemeSwitcherButton";
-import PrimaryColorChangerButton from "@/Components/PrimaryColorChangerButton";
-import ApplicationLogo from "@/Components/ApplicationLogo";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { Head, Link } from "@inertiajs/react";
 import {
-    useMantineTheme,
+    useMantineColorScheme,
     AppShell,
-    Burger,
+    Flex,
     Group,
-    Button,
-    Anchor,
     Stack,
-    rem,
-    Drawer,
+    Card,
+    Paper,
+    Anchor,
+    Button,
+    CloseButton,
+    Overlay,
+    Title,
+    Text,
 } from "@mantine/core";
-import customStyles from "../../css/moduls/appShell.module.css";
+import { IconCircleCheck, IconUserPlus, IconX } from "@tabler/icons-react";
 
-export default function Welcome({ auth }) {
-    const [opened, { open, close, toggle: toggleDrawer }] = useDisclosure();
+import Header from "@/Pages/Partials/Header/Header";
+import { headerLinkList as links } from "@/Layouts/linkLists";
+import customStyles from "@/Layouts/layout.module.css";
 
-    // read xs value from mantine theme
-    const theme = useMantineTheme();
-    const xsBreakpoint = theme.breakpoints.xs;
+export default function Welcome({ auth, accountDeleted }) {
+    const { user } = auth;
 
-    // check if screen is xs
-    const isXs = useMediaQuery(`(min-width: ${xsBreakpoint})`);
+    const headerHeight = 60;
 
-    // if screen is xs close the drawer
-    useEffect(() => {
-        if (isXs) {
-            close();
-        }
-    }, [isXs, close]);
+    const { colorScheme } = useMantineColorScheme();
+
+    const userGreeting = auth.user
+        ? `Welcome ${auth.user.first_name} ${auth.user.last_name} this is Welcome page!`
+        : "Welcome Guest!";
 
     return (
-        <>
-            <Head title="Welcome" />
+        <AppShell
+            header={{ height: headerHeight }}
+            classNames={{
+                root: customStyles.root,
+                header: customStyles.header,
+            }}
+            transitionDuration={500}
+            transitionTimingFunction="ease"
+        >
+            <AppShell.Header>
+                <Header user={user} links={links} />
+            </AppShell.Header>
 
-            <AppShell
-                header={{ height: 60 }}
-                padding="md"
-                classNames={{
-                    root: customStyles.root,
-                    header: customStyles.header,
-                }}
-            >
-                <AppShell.Header>
-                    <Group
-                        w="100%"
-                        h="100%"
-                        px={{
-                            base: "xs",
-                            sm: "xl",
-                            md: rem(50),
-                            lg: rem(100),
-                            xl: rem(200),
-                        }}
-                    >
-                        <>
-                            <Anchor href={route("home")}>
-                                <ApplicationLogo className="w-8 h-8 text-gray-500 fill-current" />
-                            </Anchor>
-                            {auth.user ? (
-                                <>
-                                    <Anchor href={route("dashboard")}>
-                                        Dashboard
-                                    </Anchor>
+            <AppShell.Navbar></AppShell.Navbar>
 
-                                    <PrimaryColorChangerButton ml="auto" />
-
-                                    <ThemeSwitcherButton />
-                                </>
-                            ) : (
-                                <>
-                                    <Button
-                                        variant="default"
-                                        component="a"
-                                        href={route("login")}
-                                        visibleFrom="xs"
-                                        ml="auto"
-                                    >
-                                        Log in
-                                    </Button>
-
-                                    <Button
-                                        component="a"
-                                        href={route("register")}
-                                        visibleFrom="xs"
-                                    >
-                                        Sign up
-                                    </Button>
-
-                                    <Burger
-                                        opened={opened}
-                                        onClick={toggleDrawer}
-                                        hiddenFrom="xs"
-                                        size="sm"
-                                        ml="auto"
-                                    />
-                                </>
-                            )}
-                        </>
-                    </Group>
-                </AppShell.Header>
-
-                <AppShell.Navbar>
-                    <Drawer
-                        opened={opened}
-                        onClose={close}
-                        title="Authentication"
-                        position="right"
-                        size={rem(250)}
-                        classNames={{
-                            inner: customStyles.drawer_margin_top,
-                            overlay: customStyles.drawer_margin_top,
-                        }}
-                        withCloseButton={false}
-                        overlayProps={{ opacity: 0.5 }}
-                        hiddenFrom="xs"
-                    >
-                        <Stack>
-                            <Button
-                                variant="default"
-                                component="a"
-                                href={route("login")}
-                            >
-                                Log in
-                            </Button>
-                            <Button component="a" href={route("register")}>
-                                Sign up
-                            </Button>
-                        </Stack>
-                    </Drawer>
-                </AppShell.Navbar>
-
-                <AppShell.Main
-                    px={{
-                        base: "xs",
-                        sm: "xl",
-                        md: rem(50),
-                        lg: rem(100),
-                        xl: rem(200),
-                    }}
+            <AppShell.Main>
+                <Head title="Welcome" />
+                <Flex
+                    direction="column"
+                    maw="80em"
+                    mt="xs"
+                    mx="auto"
+                    px={{ base: 0, xs: "md", sm: "xl" }}
+                    justify="center"
+                    align="center"
                 >
-                    <>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Cumque deleniti natus error sit nulla a, ut nam.
-                        Consequuntur est totam, odit magni fuga ipsum natus nemo
-                        assumenda pariatur odio animi.
-                    </>
-                </AppShell.Main>
-            </AppShell>
-        </>
+                    {accountDeleted && (
+                        <Overlay>
+                            <Card
+                                w={400}
+                                withBorder
+                                shadow="sm"
+                                mx="auto"
+                                mt="md"
+                            >
+                                <Card.Section align="center" withBorder p="md">
+                                    <CloseButton
+                                        pos="absolute"
+                                        size="lg"
+                                        top={0}
+                                        right={0}
+                                        onClick={(e) => {
+                                            e.target
+                                                .closest(
+                                                    ".mantine-Overlay-root"
+                                                )
+                                                .remove();
+                                        }}
+                                    />
+                                    <IconCircleCheck
+                                        size={100}
+                                        stroke={1}
+                                        color="var(--mantine-color-green-6)"
+                                    />
+                                    <Title order={1} fw="normal" my="md">
+                                        Account deleted
+                                    </Title>
+                                    <Text c="dimmed" ta="center">
+                                        Your account has been permanently
+                                        deleted.
+                                    </Text>
+                                </Card.Section>
+                                <Card.Section
+                                    align="center"
+                                    p="md"
+                                    withBorder
+                                    bg={
+                                        colorScheme === "dark"
+                                            ? "gray.8"
+                                            : "gray.0"
+                                    }
+                                >
+                                    <Stack gap="md">
+                                        <Title order={3} fw={400}>
+                                            We are sorry to see you leave.
+                                        </Title>
+
+                                        <Text c="dimmed" ta="center">
+                                            Your are always welcome to{" "}
+                                            <Anchor
+                                                component={Link}
+                                                href={route("register")}
+                                                fw="bold"
+                                            >
+                                                join us
+                                            </Anchor>{" "}
+                                            again.
+                                        </Text>
+
+                                        <Group
+                                            align="center"
+                                            justify="space-between"
+                                            mt="lg"
+                                        >
+                                            <Button
+                                                variant="default"
+                                                leftSection={
+                                                    <IconX
+                                                        size={16}
+                                                        stroke={2.5}
+                                                    />
+                                                }
+                                                onClick={(e) => {
+                                                    e.target
+                                                        .closest(
+                                                            ".mantine-Overlay-root"
+                                                        )
+                                                        .remove();
+                                                }}
+                                            >
+                                                Close
+                                            </Button>
+
+                                            <Button
+                                                component={Link}
+                                                href={route("register")}
+                                                leftSection={
+                                                    <IconUserPlus
+                                                        size={16}
+                                                        stroke={2.5}
+                                                    />
+                                                }
+                                            >
+                                                Sign up
+                                            </Button>
+                                        </Group>
+                                    </Stack>
+                                </Card.Section>
+                            </Card>
+                        </Overlay>
+                    )}
+                    <Paper
+                        w="100%"
+                        p="md"
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                        withBorder={colorScheme === "dark" ? true : false}
+                    >
+                        <Text>{userGreeting}</Text>
+                    </Paper>
+                </Flex>
+            </AppShell.Main>
+        </AppShell>
     );
 }
