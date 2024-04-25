@@ -1,0 +1,11 @@
+.root {
+    min-width: 200px;
+    background-color: light-dark(
+        var(--mantine-color-gray-light),
+        var(--mantine-color-dark-8)
+    );
+}
+
+.header {
+    min-width: 200px;
+}
