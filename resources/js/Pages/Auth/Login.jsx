@@ -1,97 +1,190 @@
-import { useEffect } from 'react';
-import Checkbox from '@/Components/Checkbox';
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from "react";
+import { Head, router, Link } from "@inertiajs/react";
+import { useDisclosure } from "@mantine/hooks";
+import { useForm as useMantineForm } from "@mantine/form";
+import {
+    Title,
+    Text,
+    Divider,
+    TextInput,
+    Button,
+    Anchor,
+    Checkbox,
+    PasswordInput,
+    Group,
+    Stack,
+    Card,
+    useMantineColorScheme,
+} from "@mantine/core";
+import { IconLogin2, IconArrowBackUp } from "@tabler/icons-react";
+import { zodResolver } from "mantine-form-zod-resolver";
+
+import GuestLayout from "@/Layouts/GuestLayout";
+import { validationSchema } from "./validationSchema";
 
 export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false,
+    const { colorScheme } = useMantineColorScheme();
+
+    const form = useMantineForm({
+        initialValues: {
+            email: "",
+            password: "",
+            remember: false,
+        },
+
+        validate: zodResolver(validationSchema),
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password');
-        };
-    }, []);
+    const [visible, { toggle }] = useDisclosure(false);
+    const [processing, setProcessing] = useState(false);
+    const [credentialsError, setCredentialsError] = useState(false);
 
-    const submit = (e) => {
-        e.preventDefault();
-
-        post(route('login'));
+    const handleSubmit = (data) => {
+        router.post(route("login"), data, {
+            onProgress: () => setProcessing(true),
+            onFinish: () => setProcessing(false),
+            onError: (err) => {
+                form.setErrors({ ...err });
+                if (err.credentials) {
+                    setCredentialsError(err.credentials);
+                }
+            },
+        });
     };
 
     return (
         <GuestLayout>
             <Head title="Log in" />
 
-            {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
-
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="block mt-4">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) => setData('remember', e.target.checked)}
-                        />
-                        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
-                    </label>
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                        >
-                            Forgot your password?
-                        </Link>
+            <Card withBorder w={420} p="md" shadow="xs" radius="md">
+                <Stack>
+                    {status && (
+                        <Text c="green.6" align="center" mt="md">
+                            {status}
+                        </Text>
                     )}
 
-                    <PrimaryButton className="ml-4" disabled={processing}>
+                    <Title
+                        mx="auto"
+                        my="sm"
+                        size="3rem"
+                        c={colorScheme === "dark" ? "dark.0" : "dark.4"}
+                    >
                         Log in
-                    </PrimaryButton>
-                </div>
-            </form>
+                    </Title>
+
+                    <Divider size="xs" />
+
+                    <form onSubmit={form.onSubmit(handleSubmit)}>
+                        {credentialsError && (
+                            <Text
+                                c="red.6"
+                                size="sm"
+                                fw={500}
+                                align="center"
+                                my="sm"
+                            >
+                                {credentialsError}
+                            </Text>
+                        )}
+
+                        <TextInput
+                            label="Email"
+                            name="email"
+                            autoComplete="email"
+                            mb="md"
+                            size="sm"
+                            withAsterisk={false}
+                            required
+                            {...form.getInputProps("email")}
+                        />
+
+                        <PasswordInput
+                            label={
+                                <Group justify="space-between" wrap="nowrap">
+                                    Password
+                                    {canResetPassword && (
+                                        <Anchor
+                                            component={Link}
+                                            href={route("password.request")}
+                                            size="xs"
+                                        >
+                                            Forgot password?
+                                        </Anchor>
+                                    )}
+                                </Group>
+                            }
+                            labelProps={{ display: "block" }}
+                            withAsterisk={false}
+                            visible={visible}
+                            onVisibilityChange={toggle}
+                            size="sm"
+                            mb="lg"
+                            required
+                            {...form.getInputProps("password")}
+                        />
+
+                        <Checkbox
+                            label="Remember me"
+                            fw="500"
+                            mb="xl"
+                            {...form.getInputProps("remember", {
+                                type: "checkbox",
+                            })}
+                        />
+
+                        <Group justify="space-between">
+                            <Button
+                                variant="outline"
+                                leftSection={
+                                    <IconArrowBackUp size={16} stroke={2.5} />
+                                }
+                                onClick={() =>
+                                    window.history.length > 1
+                                        ? window.history.back()
+                                        : (window.location.href = "/")
+                                }
+                            >
+                                Go Back
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                leftSection={
+                                    <IconLogin2 size={16} stroke={2.5} />
+                                }
+                            >
+                                Log in
+                            </Button>
+                        </Group>
+                    </form>
+                </Stack>
+
+                <Card.Section
+                    withBorder
+                    mt="md"
+                    bg={colorScheme === "dark" ? "gray.8" : "gray.0"}
+                >
+                    <Group
+                        w="full"
+                        p="lg"
+                        align="center"
+                        justify="center"
+                        gap="xs"
+                    >
+                        <Text size="sm">Don't have an account?</Text>
+
+                        <Anchor
+                            component={Link}
+                            href={route("register")}
+                            size="sm"
+                            fw={700}
+                        >
+                            Sign up here
+                        </Anchor>
+                    </Group>
+                </Card.Section>
+            </Card>
         </GuestLayout>
     );
 }
