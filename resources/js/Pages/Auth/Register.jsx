@@ -22,7 +22,9 @@ import {
     IconEqualNot,
 } from "@tabler/icons-react";
 import { zodResolver } from "mantine-form-zod-resolver";
+
 import GuestLayout from "@/Layouts/GuestLayout";
+import { PasswordWithRequirements } from "@/Components";
 import { validationSchema } from "./validationSchema";
 
 export default function Register() {
@@ -83,7 +85,6 @@ export default function Register() {
                                 label="First Name"
                                 name="first_name"
                                 autoComplete="given-name"
-                                mb="lg"
                                 size="sm"
                                 withAsterisk={false}
                                 required
@@ -94,7 +95,6 @@ export default function Register() {
                                 label="Last Name"
                                 name="last_name"
                                 autoComplete="family-name"
-                                mb="lg"
                                 size="sm"
                                 withAsterisk={false}
                                 required
@@ -105,22 +105,22 @@ export default function Register() {
                                 label="Email"
                                 name="email"
                                 autoComplete="email"
-                                mb="lg"
                                 size="sm"
                                 withAsterisk={false}
                                 required
                                 {...form.getInputProps("email")}
                             />
 
-                            <PasswordInput
+                            <PasswordWithRequirements
                                 label="Password"
                                 name="password"
                                 withAsterisk={false}
                                 visible={visible}
                                 onVisibilityChange={toggle}
                                 size="sm"
-                                mb="lg"
                                 required
+                                minPasswordLength={8}
+                                progressBar={false}
                                 {...form.getInputProps("password")}
                             />
 
