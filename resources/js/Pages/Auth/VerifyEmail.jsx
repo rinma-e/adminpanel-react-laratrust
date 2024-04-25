@@ -1,45 +1,96 @@
-import GuestLayout from '@/Layouts/GuestLayout';
-import PrimaryButton from '@/Components/PrimaryButton';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from "react";
+import { Head, router, Link } from "@inertiajs/react";
+import { useForm as useMantineForm } from "@mantine/form";
+import {
+    Title,
+    Text,
+    Divider,
+    Button,
+    Group,
+    Stack,
+    Card,
+    useMantineColorScheme,
+} from "@mantine/core";
+import { IconMail, IconLogout2 } from "@tabler/icons-react";
+
+import GuestLayout from "@/Layouts/GuestLayout";
 
 export default function VerifyEmail({ status }) {
-    const { post, processing } = useForm({});
+    const { colorScheme } = useMantineColorScheme();
+    const form = useMantineForm({});
 
-    const submit = (e) => {
-        e.preventDefault();
+    const [processing, setProcessing] = useState(false);
 
-        post(route('verification.send'));
+    const handleSubmit = (data) => {
+        router.post(route("verification.send"), data, {
+            onProgress: () => setProcessing(true),
+            onFinish: () => setProcessing(false),
+            onError: (err) => {
+                console.log(err);
+            },
+        });
     };
 
     return (
         <GuestLayout>
             <Head title="Email Verification" />
 
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                Thanks for signing up! Before getting started, could you verify your email address by clicking on the
-                link we just emailed to you? If you didn't receive the email, we will gladly send you another.
-            </div>
-
-            {status === 'verification-link-sent' && (
-                <div className="mb-4 font-medium text-sm text-green-600 dark:text-green-400">
-                    A new verification link has been sent to the email address you provided during registration.
-                </div>
+            {status === "verification-link-sent" && (
+                <Text c="green.6" align="center" my="md">
+                    A new verification link has been sent to the email address
+                    you provided during registration.
+                </Text>
             )}
 
-            <form onSubmit={submit}>
-                <div className="mt-4 flex items-center justify-between">
-                    <PrimaryButton disabled={processing}>Resend Verification Email</PrimaryButton>
-
-                    <Link
-                        href={route('logout')}
-                        method="post"
-                        as="button"
-                        className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+            <Card withBorder w={420} p="md" shadow="xs" radius="md">
+                <Stack>
+                    <Title
+                        mx="auto"
+                        my="sm"
+                        size="3rem"
+                        c={colorScheme === "dark" ? "dark.0" : "dark.4"}
+                        ta="center"
                     >
-                        Log Out
-                    </Link>
-                </div>
-            </form>
+                        Email Verification
+                    </Title>
+
+                    <Divider size="xs" />
+
+                    <Text align="center" size="sm" my="lg">
+                        Thanks for signing up! Before getting started, could you
+                        verify your email address by clicking on the link we
+                        just emailed to you? If you didn't receive the email, we
+                        will gladly send you another.
+                    </Text>
+
+                    <Divider size="xs" />
+
+                    <form onSubmit={form.onSubmit(handleSubmit)}>
+                        <Group justify="center">
+                            <Button
+                                variant="outline"
+                                component={Link}
+                                href={route("logout")}
+                                leftSection={
+                                    <IconLogout2 size={16} stroke={2.5} />
+                                }
+                                className="[@media(max-width:400px)]:order-last"
+                            >
+                                Log out
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                leftSection={
+                                    <IconMail size={16} stroke={2.5} />
+                                }
+                            >
+                                Resend Verification Email
+                            </Button>
+                        </Group>
+                    </form>
+                </Stack>
+            </Card>
         </GuestLayout>
     );
 }
