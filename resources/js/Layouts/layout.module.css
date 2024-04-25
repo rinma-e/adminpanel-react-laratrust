@@ -9,3 +9,12 @@
 .header {
     min-width: 200px;
 }
+
+.bottomBorder {
+    &[data-with-border] {
+        border: none;
+        border-radius: 0;
+        border-bottom: 1px solid
+            light-dark(var(--mantine-color-gray-3), var(--mantine-color-gray-8));
+    }
+}
