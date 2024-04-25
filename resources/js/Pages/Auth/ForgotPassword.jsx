@@ -1,50 +1,109 @@
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, useForm } from '@inertiajs/react';
+import { useState } from "react";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { Head, router } from "@inertiajs/react";
+import { useForm as useMantineForm } from "@mantine/form";
+import {
+    Title,
+    Text,
+    Divider,
+    TextInput,
+    Button,
+    Group,
+    Stack,
+    Card,
+    useMantineColorScheme,
+} from "@mantine/core";
+import { IconMail, IconArrowBackUp } from "@tabler/icons-react";
 
 export default function ForgotPassword({ status }) {
-    const { data, setData, post, processing, errors } = useForm({
-        email: '',
+    const { colorScheme } = useMantineColorScheme();
+    const form = useMantineForm({
+        initialValues: {
+            email: "",
+        },
     });
 
-    const submit = (e) => {
-        e.preventDefault();
+    const [processing, setProcessing] = useState(false);
 
-        post(route('password.email'));
+    const handleSubmit = (data) => {
+        router.post(route("password.email"), data, {
+            onProgress: () => setProcessing(true),
+            onFinish: () => setProcessing(false),
+            onError: (err) => {
+                form.setErrors({ ...err });
+            },
+        });
     };
 
     return (
         <GuestLayout>
             <Head title="Forgot Password" />
 
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                Forgot your password? No problem. Just let us know your email address and we will email you a password
-                reset link that will allow you to choose a new one.
-            </div>
+            {status && (
+                <Text c="green.6" align="center" my="md">
+                    {status}
+                </Text>
+            )}
 
-            {status && <div className="mb-4 font-medium text-sm text-green-600 dark:text-green-400">{status}</div>}
+            <Card withBorder w={420} p="md" shadow="xs" radius="md">
+                <Stack>
+                    <Title
+                        mx="auto"
+                        my="sm"
+                        size="3rem"
+                        c={colorScheme === "dark" ? "dark.0" : "dark.4"}
+                        ta="center"
+                    >
+                        Forgot Password
+                    </Title>
 
-            <form onSubmit={submit}>
-                <TextInput
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={data.email}
-                    className="mt-1 block w-full"
-                    isFocused={true}
-                    onChange={(e) => setData('email', e.target.value)}
-                />
+                    <Divider size="xs" />
 
-                <InputError message={errors.email} className="mt-2" />
+                    <Text align="center" size="sm">
+                        Forgot your password? No problem. Just let us know your
+                        email address and we will email you a password reset
+                        link that will allow you to choose a new one.
+                    </Text>
 
-                <div className="flex items-center justify-end mt-4">
-                    <PrimaryButton className="ml-4" disabled={processing}>
-                        Email Password Reset Link
-                    </PrimaryButton>
-                </div>
-            </form>
+                    <form onSubmit={form.onSubmit(handleSubmit)}>
+                        <TextInput
+                            label="Email"
+                            name="email"
+                            autoComplete="email"
+                            mb="lg"
+                            size="sm"
+                            withAsterisk={false}
+                            required
+                            {...form.getInputProps("email")}
+                        />
+
+                        <Group justify="space-between">
+                            <Button
+                                variant="outline"
+                                leftSection={
+                                    <IconArrowBackUp size={16} stroke={2.5} />
+                                }
+                                onClick={() =>
+                                    window.history.length > 1
+                                        ? window.history.back()
+                                        : (window.location.href = "/")
+                                }
+                            >
+                                Home
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                leftSection={
+                                    <IconMail size={16} stroke={2.5} />
+                                }
+                            >
+                                Email Password Reset Link
+                            </Button>
+                        </Group>
+                    </form>
+                </Stack>
+            </Card>
         </GuestLayout>
     );
 }
