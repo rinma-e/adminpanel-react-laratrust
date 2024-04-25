@@ -1,59 +1,113 @@
-import { useEffect } from 'react';
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Head, useForm } from '@inertiajs/react';
+import { useState, useEffect } from "react";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { Head, router } from "@inertiajs/react";
+import { useDisclosure } from "@mantine/hooks";
+import { useForm as useMantineForm } from "@mantine/form";
+import {
+    Title,
+    Text,
+    Divider,
+    Button,
+    Group,
+    Stack,
+    Card,
+    useMantineColorScheme,
+    PasswordInput,
+} from "@mantine/core";
+import { IconKey, IconArrowBackUp, IconAlertCircle } from "@tabler/icons-react";
 
 export default function ConfirmPassword() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        password: '',
+    const { colorScheme } = useMantineColorScheme();
+    const form = useMantineForm({
+        initialValues: {
+            password: "",
+        },
     });
 
     useEffect(() => {
         return () => {
-            reset('password');
+            form.reset();
         };
     }, []);
 
-    const submit = (e) => {
-        e.preventDefault();
+    const [processing, setProcessing] = useState(false);
+    const [visible, { toggle }] = useDisclosure(false);
 
-        post(route('password.confirm'));
+    const handleSubmit = (data) => {
+        router.post(route("password.confirm"), data, {
+            onProgress: () => setProcessing(true),
+            onFinish: () => setProcessing(false),
+            onError: (err) => {
+                form.setErrors({ ...err });
+            },
+        });
     };
 
     return (
         <GuestLayout>
             <Head title="Confirm Password" />
 
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                This is a secure area of the application. Please confirm your password before continuing.
-            </div>
+            <Card withBorder w={420} p="md" shadow="xs" radius="md">
+                <Stack>
+                    <Title
+                        mx="auto"
+                        my="sm"
+                        size="3rem"
+                        c={colorScheme === "dark" ? "dark.0" : "dark.4"}
+                        ta="center"
+                    >
+                        Confirm Password
+                    </Title>
 
-            <form onSubmit={submit}>
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <Divider size="xs" />
 
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        isFocused={true}
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
+                    <Group wrap="nowrap" c="yellow.9">
+                        <IconAlertCircle size={80} stroke={1} />
+                        <Text size="sm" my="lg">
+                            This is a secure area of the application. Please
+                            confirm your password before continuing.
+                        </Text>
+                    </Group>
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
+                    <Divider size="xs" />
 
-                <div className="flex items-center justify-end mt-4">
-                    <PrimaryButton className="ml-4" disabled={processing}>
-                        Confirm
-                    </PrimaryButton>
-                </div>
-            </form>
+                    <form onSubmit={form.onSubmit(handleSubmit)}>
+                        <PasswordInput
+                            label="Confirm Password"
+                            withAsterisk={false}
+                            visible={visible}
+                            onVisibilityChange={toggle}
+                            size="sm"
+                            mb="lg"
+                            required
+                            {...form.getInputProps("password")}
+                        />
+
+                        <Group justify="space-between">
+                            <Button
+                                variant="outline"
+                                leftSection={
+                                    <IconArrowBackUp size={16} stroke={2.5} />
+                                }
+                                onClick={() =>
+                                    window.history.length > 1
+                                        ? window.history.back()
+                                        : (window.location.href = "/")
+                                }
+                            >
+                                Home
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                leftSection={<IconKey size={16} stroke={2.5} />}
+                            >
+                                Confirm
+                            </Button>
+                        </Group>
+                    </form>
+                </Stack>
+            </Card>
         </GuestLayout>
     );
 }
