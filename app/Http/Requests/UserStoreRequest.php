@@ -35,6 +35,7 @@ class UserStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'password.min' => 'Password must be at least 8 characters.',
             'password_confirmation.required' => 'Please confirm your password.',
         ];
     }
