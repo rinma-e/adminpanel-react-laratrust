@@ -1,0 +1,122 @@
+.tabsList {
+    &::before {
+        display: none;
+    }
+}
+
+.tab {
+    font-size: var(--mantine-font-size-sm);
+    background-color: transparent;
+    position: relative;
+    border-bottom-width: 2px;
+
+    &::before,
+    &::after {
+        background-color: light-dark(
+            var(--mantine-color-gray-2),
+            var(--mantine-color-dark-7)
+        ) !important;
+    }
+
+    &:hover {
+        background-color: light-dark(
+            var(--mantine-color-gray-1),
+            var(--mantine-color-dark-5)
+        );
+
+        border-bottom-color: var(--mantine-primary-color-filled);
+    }
+
+    &:hover:first-of-type {
+        border-bottom-color: transparent;
+    }
+
+    &:first-of-type:hover::before {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: var(--mantine-radius-md);
+        height: var(--mantine-radius-md);
+        background-color: transparent !important;
+        border-top-left-radius: var(--mantine-radius-md);
+        border-top-width: 2px;
+
+        border-top-color: var(--mantine-primary-color-filled);
+    }
+
+    &:first-of-type:hover::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: var(--mantine-radius-md);
+        right: 0;
+        background-color: none;
+        border-top-left-radius: var(--mantine-radius-md);
+        border-top-width: 2px;
+
+        border-top-color: var(--mantine-primary-color-filled);
+    }
+
+    &[data-active] {
+        background-color: light-dark(
+            var(--mantine-color-white),
+            var(--mantine-color-dark-7)
+        );
+        border-color: var(--mantine-color-default-border);
+        border-bottom-color: transparent;
+        margin-top: -2px;
+        top: 1px;
+    }
+
+    &[data-active]::after,
+    &[data-active]::before {
+        border: none;
+    }
+}
+
+.tab_vertical {
+    font-size: var(--mantine-font-size-sm);
+    background-color: transparent;
+    position: relative;
+    border-bottom-width: 2px;
+
+    &::before,
+    &::after {
+        background-color: light-dark(
+            var(--mantine-color-gray-2),
+            var(--mantine-color-dark-7)
+        ) !important;
+    }
+
+    &:hover {
+        background-color: light-dark(
+            var(--mantine-color-gray-1),
+            var(--mantine-color-dark-5)
+        );
+        border-bottom-color: var(--mantine-primary-color-filled);
+    }
+
+    &[data-active] {
+        background-color: light-dark(
+            var(--mantine-color-white),
+            var(--mantine-color-dark-7)
+        );
+        border-color: var(--mantine-color-default-border);
+        border-right-color: transparent;
+        border-bottom-width: 1px;
+        margin-bottom: 1px;
+        margin-left: -1px;
+        left: 1px;
+    }
+}
+
+.tabPanel {
+    border: 1px solid var(--mantine-color-default-border);
+    background-color: light-dark(
+        var(--mantine-color-white),
+        var(--mantine-color-dark-7)
+    );
+    padding: var(--mantine-spacing-lg);
+    border-radius: var(--mantine-radius-md);
+}
