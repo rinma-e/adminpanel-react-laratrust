@@ -1,11 +1,14 @@
 import { forwardRef } from "react";
 import { IconChevronDown } from "@tabler/icons-react";
-import { Group, Stack, Text, UnstyledButton } from "@mantine/core";
+import { Group, Stack, Text, UnstyledButton, Avatar } from "@mantine/core";
 
 const UserButton = forwardRef(
     (
         {
             h = "100%",
+            withAvatar,
+            imageSrc,
+            imageRadius = 9999,
             title,
             subTitle,
             menuIcon = <IconChevronDown size={16} />,
@@ -19,6 +22,21 @@ const UserButton = forwardRef(
     ) => (
         <UnstyledButton ref={ref} h={h} {...others}>
             <Group gap={gap} wrap="nowrap" h="100%">
+                {withAvatar && (
+                    <Avatar
+                        src={imageSrc}
+                        radius={imageRadius}
+                        styles={{
+                            image: {
+                                width: "fit-content",
+                                minWidth: "fit-content",
+                                height: "100%",
+                                objectFit: "cover",
+                            },
+                        }}
+                    />
+                )}
+
                 <Stack
                     gap={infoGap}
                     visibleFrom={infoVisibleFrom}
@@ -32,6 +50,7 @@ const UserButton = forwardRef(
                         {subTitle}
                     </Text>
                 </Stack>
+
                 {menuIcon}
             </Group>
         </UnstyledButton>
