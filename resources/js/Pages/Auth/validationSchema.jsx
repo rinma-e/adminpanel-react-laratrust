@@ -21,6 +21,33 @@ const PASSWORD_VALIDATION = {
     },
 };
 
+// image validation tests
+const ACCEPTED_IMAGE_TYPES = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "image/svg+xml",
+];
+
+const ACCEPTED_IMAGE_SIZE_MB = 2;
+const ACCEPTED_IMAGE_SIZE_KB = ACCEPTED_IMAGE_SIZE_MB * 1024 * 1024; // 2MB
+const IMAGE_VALIDATION = {
+    TEST: {
+        MIME_TYPE: (file) => {
+            return ACCEPTED_IMAGE_TYPES.includes(file?.type);
+        },
+        MAX_SIZE: (file) => file?.size <= ACCEPTED_IMAGE_SIZE_KB,
+    },
+    MSG: {
+        MIME_TYPE: `Invalid file type. Accepted types: ${ACCEPTED_IMAGE_TYPES.join(
+            ", "
+        )}`,
+        MAX_SIZE: `Image file size must be less than ${ACCEPTED_IMAGE_SIZE_MB}MB`,
+    },
+};
+
 export const validationSchema = z
     .object({
         first_name: z
@@ -40,6 +67,7 @@ export const validationSchema = z
             .optional(),
         password: z.string().optional(),
         password_confirmation: z.string().optional(),
+        avatar: z.any().optional(),
     })
     .superRefine(({ password, password_confirmation, avatar }, ctx) => {
         // perform all the tests from the PASSWORD_VALIDATION object
@@ -69,6 +97,24 @@ export const validationSchema = z
 
                 // stop the validation if current tests fails
                 return z.NEVER;
+            }
+        }
+
+        // perform all the tests from the IMAGE_VALIDATION object
+        if (avatar && typeof avatar === "object") {
+            for (const field in IMAGE_VALIDATION.TEST) {
+                // if one of the tests fails create an issue with the error message
+                if (!IMAGE_VALIDATION.TEST[field](avatar)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: IMAGE_VALIDATION.MSG[field],
+                        path: ["avatar"],
+                        fatal: true,
+                    });
+
+                    // stop the validation if current tests fails
+                    return z.NEVER;
+                }
             }
         }
     });
