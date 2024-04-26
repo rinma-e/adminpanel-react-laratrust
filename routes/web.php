@@ -21,7 +21,9 @@ use App\Http\Controllers\ProfileController;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return Inertia::render('Welcome', [
+        'accountDeleted' => session('accountDeleted'),
+    ]);
 })->name('home');
 
 Route::get('/dashboard', function () {
