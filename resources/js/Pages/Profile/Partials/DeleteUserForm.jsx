@@ -1,99 +1,173 @@
-import { useRef, useState } from 'react';
-import DangerButton from '@/Components/DangerButton';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import Modal from '@/Components/Modal';
-import SecondaryButton from '@/Components/SecondaryButton';
-import TextInput from '@/Components/TextInput';
-import { useForm } from '@inertiajs/react';
+import { useState, useEffect } from "react";
+import { router } from "@inertiajs/react";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { useForm as useMantineForm } from "@mantine/form";
+import {
+    useMantineTheme,
+    Text,
+    Button,
+    Group,
+    Stack,
+    PasswordInput,
+    Modal,
+    Title,
+    CloseButton,
+} from "@mantine/core";
+import { IconAlertTriangle, IconTrash } from "@tabler/icons-react";
 
-export default function DeleteUserForm({ className = '' }) {
-    const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
-    const passwordInput = useRef();
+import { useColor } from "@/Context/PrimaryColorProviderContext";
 
-    const {
-        data,
-        setData,
-        delete: destroy,
-        processing,
-        reset,
-        errors,
-    } = useForm({
-        password: '',
+export default function DeleteUserForm({ activeTab }) {
+    const { removePrimaryColor, removePrimaryColorShade } = useColor();
+
+    const form = useMantineForm({
+        initialValues: {
+            password: "",
+            _method: "delete",
+        },
     });
 
-    const confirmUserDeletion = () => {
-        setConfirmingUserDeletion(true);
+    const [visible, { toggle }] = useDisclosure(false);
+    const [disableSubmitButton, setDisableSubmitButton] = useState(true);
+    const [opened, { open, close }] = useDisclosure(false);
+
+    // read xs value from mantine theme
+    const theme = useMantineTheme();
+    const xsBreakpoint = theme.breakpoints.xs;
+
+    // check if screen is xs
+    const isXs = useMediaQuery(`(min-width: ${xsBreakpoint})`);
+
+    const closeModal = () => {
+        close();
+
+        form.reset();
     };
 
-    const deleteUser = (e) => {
-        e.preventDefault();
+    // check did data change from initial values on every value change and set disable submit button to true or false
+    useEffect(() => {
+        form.isDirty() // if data to change from initial values isDirty is true
+            ? setDisableSubmitButton(false)
+            : setDisableSubmitButton(true);
+    }, [form.values]); // make sure to run it on every value change
 
-        destroy(route('profile.destroy'), {
+    const handleDeleteAccount = (data) => {
+        // send active tab in data
+        data["activeTab"] = activeTab;
+
+        router.post(route("profile.destroy"), data, {
             preserveScroll: true,
-            onSuccess: () => closeModal(),
-            onError: () => passwordInput.current.focus(),
-            onFinish: () => reset(),
+            preserveState: (page) => Object.keys(page.props.errors).length,
+            onProgress: () => setDisableSubmitButton(true),
+            onSuccess: () => {
+                closeModal();
+                removePrimaryColor();
+                removePrimaryColorShade();
+            },
+            onFinish: () => setDisableSubmitButton(true),
+            onError: (err) => {
+                // set server side errors in form
+                form.setErrors({ ...err });
+            },
         });
     };
 
-    const closeModal = () => {
-        setConfirmingUserDeletion(false);
-
-        reset();
-    };
-
     return (
-        <section className={`space-y-6 ${className}`}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Delete Account</h2>
+        <Stack>
+            <Title order={3} ta="left">
+                Delete Account
+            </Title>
 
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Once your account is deleted, all of its resources and data will be permanently deleted. Before
-                    deleting your account, please download any data or information that you wish to retain.
-                </p>
-            </header>
+            <Text c="red.6" size="sm" ta="justify" fw={500}>
+                Once your account is deleted, all of its resources and data will
+                be permanently deleted. Before deleting your account, please
+                download any data or information that you wish to retain.
+            </Text>
 
-            <DangerButton onClick={confirmUserDeletion}>Delete Account</DangerButton>
+            <Group justify="flex-end">
+                <Button
+                    color="red.6"
+                    leftSection={<IconTrash size={16} stroke={2.5} />}
+                    onClick={open}
+                >
+                    Delete Account
+                </Button>
+            </Group>
 
-            <Modal show={confirmingUserDeletion} onClose={closeModal}>
-                <form onSubmit={deleteUser} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                        Are you sure you want to delete your account?
-                    </h2>
+            <Modal
+                padding="lg"
+                centered={isXs ? true : false}
+                withCloseButton={false}
+                opened={opened}
+                onClose={closeModal}
+            >
+                <form onSubmit={form.onSubmit(handleDeleteAccount)}>
+                    <Stack>
+                        <Group
+                            align="flex-start"
+                            justify="center"
+                            gap={0}
+                            pos="relative"
+                            mb={-10}
+                        >
+                            <IconAlertTriangle
+                                size={120}
+                                stroke={1.5}
+                                color={"var(--mantine-color-red-6)"}
+                            />
 
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        Once your account is deleted, all of its resources and data will be permanently deleted. Please
-                        enter your password to confirm you would like to permanently delete your account.
-                    </p>
+                            <CloseButton
+                                onClick={closeModal}
+                                pos="absolute"
+                                right={0}
+                            />
+                        </Group>
 
-                    <div className="mt-6">
-                        <InputLabel htmlFor="password" value="Password" className="sr-only" />
+                        <Title order={2} ta="center" fw="semibold" mb={10}>
+                            Are you sure you want to delete your account?
+                        </Title>
 
-                        <TextInput
-                            id="password"
-                            type="password"
-                            name="password"
-                            ref={passwordInput}
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            className="mt-1 block w-3/4"
-                            isFocused
-                            placeholder="Password"
-                        />
+                        <Text ta="center" px="lg">
+                            Once your account is deleted, all of its resources
+                            and data will be permanently deleted.
+                        </Text>
 
-                        <InputError message={errors.password} className="mt-2" />
-                    </div>
+                        <Text c="dimmed" size="sm" ta="center" px="lg">
+                            Please enter your password to confirm you would like
+                            to permanently delete your account.
+                        </Text>
 
-                    <div className="mt-6 flex justify-end">
-                        <SecondaryButton onClick={closeModal}>Cancel</SecondaryButton>
+                        <Stack px="lg" justify="center">
+                            <PasswordInput
+                                label="Password"
+                                withAsterisk={false}
+                                visible={visible}
+                                onVisibilityChange={toggle}
+                                size="sm"
+                                required
+                                {...form.getInputProps("password")}
+                            />
 
-                        <DangerButton className="ml-3" disabled={processing}>
-                            Delete Account
-                        </DangerButton>
-                    </div>
+                            <Group justify="space-around">
+                                <Button variant="default" onClick={closeModal}>
+                                    NO, don't delete it
+                                </Button>
+
+                                <Button
+                                    type="submit"
+                                    color="red.6"
+                                    disabled={disableSubmitButton}
+                                    leftSection={
+                                        <IconTrash size={16} stroke={2.5} />
+                                    }
+                                >
+                                    Delete Account
+                                </Button>
+                            </Group>
+                        </Stack>
+                    </Stack>
                 </form>
             </Modal>
-        </section>
+        </Stack>
     );
 }
