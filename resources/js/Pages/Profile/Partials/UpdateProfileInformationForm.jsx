@@ -16,10 +16,10 @@ import {
     IconDeviceFloppy,
     IconAlertTriangle,
     IconInfoCircle,
-    IconUserCog,
 } from "@tabler/icons-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 
+import { AvatarDropzone } from "@/Components";
 import { validationSchema } from "@/Pages/Auth/validationSchema";
 
 export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
@@ -34,6 +34,8 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
             first_name: user.first_name,
             last_name: user.last_name,
             email: user.email,
+            avatar: user.avatar_url,
+            _method: "patch", // laravel is not supporting file uploads in PATCH requests so we need to send post request with '_method: "patch"' in the form data
         },
         initialErrors: {
             email: emailVerified ? "Your email address is unverified" : null,
@@ -142,14 +144,11 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                         align="center"
                         mx="auto"
                     >
-                        <IconUserCog
-                            size={100}
-                            stroke={0.5}
-                            color={"var(--mantine-color-dimmed)"}
-                            style={{
-                                marginLeft: rem(-15),
-                                marginTop: rem(-10),
-                            }}
+                        <AvatarDropzone
+                            form={form}
+                            size={120}
+                            name="avatar"
+                            {...form.getInputProps("avatar")}
                         />
                     </Grid.Col>
 
@@ -163,7 +162,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                             label="First Name"
                             name="first_name"
                             autoComplete="given-name"
-                            mb="md"
+                            mb="lg"
                             size="sm"
                             withAsterisk={false}
                             required
@@ -174,7 +173,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                             label="Last Name"
                             name="last_name"
                             autoComplete="family-name"
-                            mb="md"
+                            mb="lg"
                             size="sm"
                             withAsterisk={false}
                             required
@@ -185,7 +184,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                             label="Email"
                             name="email"
                             autoComplete="email"
-                            mb="xl"
+                            mb="lg"
                             size="sm"
                             withAsterisk={false}
                             required
