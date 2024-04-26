@@ -60,11 +60,33 @@ class User extends Authenticatable implements LaratrustUser
     }
 
     /**
+     * Get the user's roles.
+     *
+     * @return array
+     */
+    public function getRolesAttribute(): array
+    {
+        return $this->getRoles();
+    }
+
+    /**
+     * Get the user's permissions.
+     *
+     * @return  array
+     */
+    public function getPermissionsAttribute(): array
+    {
+        return $this->allPermissions()->pluck('name')->toArray();
+    }
+
+    /**
      * Append additional attributes to the model.
      *
      * @var array
      */
     protected $appends = [
         'avatar_url',
+        'roles',
+        'permissions',
     ];
 }
