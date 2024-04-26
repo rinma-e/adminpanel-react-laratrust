@@ -34,6 +34,8 @@ export function UserMenu({ user, ...props }) {
         >
             <Menu.Target>
                 <UserButton
+                    withAvatar
+                    imageSrc={user.avatar_url}
                     title={user.first_name + " " + user.last_name}
                     subTitle={user.email}
                     opened={userMenuOpened.toString()}
