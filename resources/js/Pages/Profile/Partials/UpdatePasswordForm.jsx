@@ -1,113 +1,189 @@
-import { useRef } from 'react';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { useForm } from '@inertiajs/react';
-import { Transition } from '@headlessui/react';
+import { useState, useEffect } from "react";
+import { router } from "@inertiajs/react";
+import { useDisclosure } from "@mantine/hooks";
+import { useForm as useMantineForm } from "@mantine/form";
+import {
+    Text,
+    Button,
+    PasswordInput,
+    Group,
+    Stack,
+    Grid,
+    Notification,
+    rem,
+} from "@mantine/core";
+import {
+    IconDeviceFloppy,
+    IconLockCog,
+    IconEqual,
+    IconEqualNot,
+    IconInfoCircle,
+} from "@tabler/icons-react";
+import { zodResolver } from "mantine-form-zod-resolver";
 
-export default function UpdatePasswordForm({ className = '' }) {
-    const passwordInput = useRef();
-    const currentPasswordInput = useRef();
+import { PasswordWithRequirements } from "@/Components";
+import { validationSchema } from "@/Pages/Auth/validationSchema";
 
-    const { data, setData, errors, put, reset, processing, recentlySuccessful } = useForm({
-        current_password: '',
-        password: '',
-        password_confirmation: '',
+export default function UpdatePasswordForm({ activeTab, status }) {
+    const [visible, { toggle }] = useDisclosure(false);
+    const [disableSubmitButton, setDisableSubmitButton] = useState(true);
+
+    const form = useMantineForm({
+        initialValues: {
+            current_password: "",
+            password: "",
+            password_confirmation: "",
+        },
+
+        validate: zodResolver(validationSchema),
     });
 
-    const updatePassword = (e) => {
-        e.preventDefault();
+    // check did data change from initial values on every value change and set disable submit button to true or false
+    useEffect(() => {
+        form.isDirty() // if data to change from initial values isDirty is true
+            ? setDisableSubmitButton(false)
+            : setDisableSubmitButton(true);
+    }, [form.values]); // make sure to run it on every value change
 
-        put(route('password.update'), {
+    useEffect(() => {
+        if (!form.values.password) {
+            form.setFieldValue("password_confirmation", "");
+        }
+    }, [form.values.password]);
+
+    const handleSubmitPassword = (data) => {
+        // send active tab in data
+        data["activeTab"] = activeTab;
+
+        router.put(route("password.update"), data, {
             preserveScroll: true,
-            onSuccess: () => reset(),
-            onError: (errors) => {
-                if (errors.password) {
-                    reset('password', 'password_confirmation');
-                    passwordInput.current.focus();
-                }
-
-                if (errors.current_password) {
-                    reset('current_password');
-                    currentPasswordInput.current.focus();
-                }
+            preserveState: (page) => Object.keys(page.props.errors).length,
+            onProgress: () => setDisableSubmitButton(true),
+            onSuccess: () => {
+                form.reset();
+            },
+            onFinish: () => setDisableSubmitButton(true),
+            onError: (err) => {
+                // set server side errors in form
+                form.setErrors({ ...err });
             },
         });
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Update Password</h2>
-
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Ensure your account is using a long, random password to stay secure.
-                </p>
-            </header>
-
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="current_password" value="Current Password" />
-
-                    <TextInput
-                        id="current_password"
-                        ref={currentPasswordInput}
-                        value={data.current_password}
-                        onChange={(e) => setData('current_password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                    />
-
-                    <InputError message={errors.current_password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password" value="New Password" />
-
-                    <TextInput
-                        id="password"
-                        ref={passwordInput}
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
-                    <TextInput
-                        id="password_confirmation"
-                        value={data.password_confirmation}
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError message={errors.password_confirmation} className="mt-2" />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
+        <Stack>
+            {status === "password-updated" && (
+                <Notification
+                    icon={
+                        <IconInfoCircle color="var(--mantine-color-green-light-color)" />
+                    }
+                    color="transparent"
+                    withBorder
+                    onClose={(e) =>
+                        (e.target.closest(
+                            ".mantine-Notification-root"
+                        ).style.display = "none")
+                    }
+                    mb="lg"
+                >
+                    <Text size="sm" c="var(--mantine-color-green-light-color)">
+                        Password has been successfully updated.
+                    </Text>
+                </Notification>
+            )}
+            <form onSubmit={form.onSubmit(handleSubmitPassword)}>
+                <Grid gutter={rem(40)}>
+                    <Grid.Col
+                        span={{ base: 12, xs: "content" }}
+                        align="center"
+                        mx="auto"
                     >
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Saved.</p>
-                    </Transition>
-                </div>
+                        <IconLockCog
+                            size={100}
+                            stroke={0.5}
+                            color={"var(--mantine-color-dimmed)"}
+                            style={{
+                                marginLeft: rem(-15),
+                                marginTop: rem(-10),
+                            }}
+                        />
+                    </Grid.Col>
+
+                    <Grid.Col
+                        span={{ base: 12, xs: "auto" }}
+                        miw={{ base: rem(240), xs: rem(100) }}
+                        mx="auto"
+                        pl={{ xs: 0 }}
+                        align="left"
+                    >
+                        <PasswordInput
+                            label="Current Password"
+                            withAsterisk={false}
+                            visible={visible}
+                            onVisibilityChange={toggle}
+                            size="sm"
+                            mb="lg"
+                            required
+                            {...form.getInputProps("current_password")}
+                        />
+
+                        <PasswordWithRequirements
+                            label="Password"
+                            name="password"
+                            withAsterisk={false}
+                            visible={visible}
+                            onVisibilityChange={toggle}
+                            size="sm"
+                            mb="lg"
+                            required
+                            minPasswordLength={8}
+                            progressBar={false}
+                            {...form.getInputProps("password")}
+                        />
+
+                        <PasswordInput
+                            label="Confirm Password"
+                            withAsterisk={false}
+                            visible={visible}
+                            onVisibilityChange={toggle}
+                            size="sm"
+                            mb="lg"
+                            required
+                            disabled={!form.values.password}
+                            {...form.getInputProps("password_confirmation")}
+                            leftSection={
+                                form.values.password_confirmation &&
+                                (form.values.password_confirmation ===
+                                form.values.password ? (
+                                    <IconEqual
+                                        size={16}
+                                        stroke={2}
+                                        color="var(--mantine-color-green-7)"
+                                    />
+                                ) : (
+                                    <IconEqualNot
+                                        size={16}
+                                        stroke={2}
+                                        color="var(--mantine-color-red-7)"
+                                    />
+                                ))
+                            }
+                        />
+
+                        <Group justify="flex-end">
+                            <Button
+                                type="submit"
+                                disabled={disableSubmitButton}
+                                leftSection={
+                                    <IconDeviceFloppy size={16} stroke={2.5} />
+                                }
+                            >
+                                Save
+                            </Button>
+                        </Group>
+                    </Grid.Col>
+                </Grid>
             </form>
-        </section>
+        </Stack>
     );
 }
