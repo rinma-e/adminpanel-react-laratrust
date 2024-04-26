@@ -32,12 +32,16 @@ class RegisteredUserController extends Controller
     {
         $request->validated();
 
+        if ($request->hasFile('avatar')) {
+            $avatarName = $request->file('avatar')->store('/', 'profile-photos');
+        }
+
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'avatar' => $request->avatar,
+            'avatar' => $avatarName ?? null,
         ]);
 
         event(new Registered($user));

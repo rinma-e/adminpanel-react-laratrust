@@ -7,6 +7,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -48,8 +49,22 @@ class User extends Authenticatable implements LaratrustUser
         'password' => 'hashed',
     ];
 
-    public function getAvatarUrl()
+    /**
+     * Get the user's avatar URL.
+     *
+     * @return string|null
+     */
+    public function getAvatarUrlAttribute(): ?string
     {
         return $this->avatar ? Storage::disk('profile-photos')->url($this->avatar) : null;
     }
+
+    /**
+     * Append additional attributes to the model.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'avatar_url',
+    ];
 }

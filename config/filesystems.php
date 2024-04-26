@@ -39,15 +39,15 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],
 
         'profile-photos' => [
             'driver' => 'local',
-            'root' => storage_path('app/profile-photos'),
-            'url' => env('APP_URL').'/storage',
+            'root' => storage_path('app/public/profile-photos'),
+            'url' => env('APP_URL') . '/storage/profile-photos',
             'visibility' => 'public',
             'throw' => false,
         ],

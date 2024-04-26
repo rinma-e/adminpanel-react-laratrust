@@ -29,6 +29,7 @@ class UserStoreRequest extends FormRequest
             'email' => 'required|email:rfc,filter|unique:' . User::class,
             'password' => ['bail', 'required', Password::defaults()],
             'password_confirmation' => 'required',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ];
     }
 
@@ -37,6 +38,7 @@ class UserStoreRequest extends FormRequest
         return [
             'password.min' => 'Password must be at least 8 characters.',
             'password_confirmation.required' => 'Please confirm your password.',
+            'avatar.max' => 'Image file size must be less than 2MB',
         ];
     }
 
