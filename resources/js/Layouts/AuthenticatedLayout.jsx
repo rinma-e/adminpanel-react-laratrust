@@ -7,6 +7,14 @@ import customStyles from "./layout.module.css";
 export default function AuthenticatedLayout({ user, header, children }) {
     const headerHeight = 60;
 
+    const canAccessLink = (link) => {
+        if (!link.role || link.role === "all") return true; // Link is accessible to all roles
+        const linkRoles = link.role.split("|");
+        return linkRoles.some((role) => user?.roles?.includes(role)) || false;
+    };
+
+    const userAccessableLinks = links.filter(canAccessLink);
+
     return (
         <AppShell
             header={{ height: headerHeight }}
@@ -16,7 +24,7 @@ export default function AuthenticatedLayout({ user, header, children }) {
             }}
         >
             <AppShell.Header>
-                <Header user={user} links={links} />
+                <Header user={user} links={userAccessableLinks} />
             </AppShell.Header>
 
             <AppShell.Main>

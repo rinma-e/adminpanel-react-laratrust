@@ -27,6 +27,14 @@ export default function Welcome({ auth, accountDeleted }) {
 
     const { colorScheme } = useMantineColorScheme();
 
+    const canAccessLink = (link) => {
+        if (!link.role || link.role === "all") return true; // Link is accessible to all roles
+        const linkRoles = link.role.split("|");
+        return linkRoles.some((role) => user?.roles?.includes(role)) || false;
+    };
+
+    const userAccessableLinks = links.filter(canAccessLink);
+
     const userGreeting = auth.user
         ? `Welcome ${auth.user.first_name} ${auth.user.last_name} this is Welcome page!`
         : "Welcome Guest!";
@@ -42,7 +50,7 @@ export default function Welcome({ auth, accountDeleted }) {
             transitionTimingFunction="ease"
         >
             <AppShell.Header>
-                <Header user={user} links={links} />
+                <Header user={user} links={userAccessableLinks} />
             </AppShell.Header>
 
             <AppShell.Navbar></AppShell.Navbar>
