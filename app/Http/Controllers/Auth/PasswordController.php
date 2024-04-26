@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\Rules\Password;
+use App\Http\Requests\PasswordUpdateRequest;
 
 class PasswordController extends Controller
 {
@@ -21,6 +22,6 @@ class PasswordController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back();
+        return back()->with('status', 'password-updated')->with('activeTab', $request->activeTab);
     }
 }
