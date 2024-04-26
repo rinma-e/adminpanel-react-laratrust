@@ -14,6 +14,7 @@ import {
     Group,
     Stack,
     Card,
+    Grid,
 } from "@mantine/core";
 import {
     IconUserPlus,
@@ -24,6 +25,7 @@ import {
 import { zodResolver } from "mantine-form-zod-resolver";
 
 import GuestLayout from "@/Layouts/GuestLayout";
+import { AvatarDropzone } from "@/Components";
 import { PasswordWithRequirements } from "@/Components";
 import { validationSchema } from "./validationSchema";
 
@@ -37,6 +39,7 @@ export default function Register() {
             email: "",
             password: "",
             password_confirmation: "",
+            avatar: null,
         },
 
         validate: zodResolver(validationSchema),
@@ -66,7 +69,7 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
 
-            <Card withBorder w={420} p="md" shadow="xs" radius="md">
+            <Card withBorder w={520} p="md" shadow="xs" radius="md">
                 <Stack>
                     <Title
                         mx="auto"
@@ -80,108 +83,131 @@ export default function Register() {
                     <Divider size="xs" />
 
                     <form onSubmit={form.onSubmit(handleSubmit)}>
-                        <Stack>
-                            <TextInput
-                                label="First Name"
-                                name="first_name"
-                                autoComplete="given-name"
-                                size="sm"
-                                withAsterisk={false}
-                                required
-                                {...form.getInputProps("first_name")}
-                            />
+                        <Grid gutter="xl" justify="center">
+                            <Grid.Col
+                                span={{ base: 12, xs: "content" }}
+                                align="center"
+                            >
+                                <AvatarDropzone
+                                    form={form}
+                                    name="avatar"
+                                    size={120}
+                                    {...form.getInputProps("avatar")}
+                                />
+                            </Grid.Col>
 
-                            <TextInput
-                                label="Last Name"
-                                name="last_name"
-                                autoComplete="family-name"
-                                size="sm"
-                                withAsterisk={false}
-                                required
-                                {...form.getInputProps("last_name")}
-                            />
+                            <Grid.Col span="auto">
+                                <TextInput
+                                    label="First Name"
+                                    name="first_name"
+                                    autoComplete="given-name"
+                                    mb="md"
+                                    size="sm"
+                                    withAsterisk={false}
+                                    required
+                                    {...form.getInputProps("first_name")}
+                                />
 
-                            <TextInput
-                                label="Email"
-                                name="email"
-                                autoComplete="email"
-                                size="sm"
-                                withAsterisk={false}
-                                required
-                                {...form.getInputProps("email")}
-                            />
+                                <TextInput
+                                    label="Last Name"
+                                    name="last_name"
+                                    autoComplete="family-name"
+                                    mb="md"
+                                    size="sm"
+                                    withAsterisk={false}
+                                    required
+                                    {...form.getInputProps("last_name")}
+                                />
 
-                            <PasswordWithRequirements
-                                label="Password"
-                                name="password"
-                                withAsterisk={false}
-                                visible={visible}
-                                onVisibilityChange={toggle}
-                                size="sm"
-                                required
-                                minPasswordLength={8}
-                                progressBar={false}
-                                {...form.getInputProps("password")}
-                            />
+                                <TextInput
+                                    label="Email"
+                                    name="email"
+                                    autoComplete="email"
+                                    mb="md"
+                                    size="sm"
+                                    withAsterisk={false}
+                                    required
+                                    {...form.getInputProps("email")}
+                                />
 
-                            <PasswordInput
-                                label="Confirm Password"
-                                withAsterisk={false}
-                                visible={visible}
-                                onVisibilityChange={toggle}
-                                size="sm"
-                                mb="lg"
-                                required
-                                disabled={!form.values.password}
-                                {...form.getInputProps("password_confirmation")}
-                                leftSection={
-                                    form.values.password_confirmation &&
-                                    (form.values.password_confirmation ===
-                                    form.values.password ? (
-                                        <IconEqual
-                                            size={16}
-                                            stroke={2}
-                                            color="var(--mantine-color-green-7)"
-                                        />
-                                    ) : (
-                                        <IconEqualNot
-                                            size={16}
-                                            stroke={2}
-                                            color="var(--mantine-color-red-7)"
-                                        />
-                                    ))
-                                }
-                            />
+                                <PasswordWithRequirements
+                                    label="Password"
+                                    name="password"
+                                    withAsterisk={false}
+                                    visible={visible}
+                                    onVisibilityChange={toggle}
+                                    size="sm"
+                                    mb="md"
+                                    required
+                                    minPasswordLength={8}
+                                    progressBar={false}
+                                    {...form.getInputProps("password")}
+                                />
 
-                            <Group justify="space-between">
-                                <Button
-                                    variant="outline"
+                                <PasswordInput
+                                    label="Confirm Password"
+                                    withAsterisk={false}
+                                    visible={visible}
+                                    onVisibilityChange={toggle}
+                                    size="sm"
+                                    mb="xl"
+                                    required
+                                    disabled={!form.values.password}
+                                    {...form.getInputProps(
+                                        "password_confirmation"
+                                    )}
                                     leftSection={
-                                        <IconArrowBackUp
-                                            size={16}
-                                            stroke={2.5}
-                                        />
+                                        form.values.password_confirmation &&
+                                        (form.values.password_confirmation ===
+                                        form.values.password ? (
+                                            <IconEqual
+                                                size={16}
+                                                stroke={2}
+                                                color="var(--mantine-color-green-7)"
+                                            />
+                                        ) : (
+                                            <IconEqualNot
+                                                size={16}
+                                                stroke={2}
+                                                color="var(--mantine-color-red-7)"
+                                            />
+                                        ))
                                     }
-                                    onClick={() =>
-                                        window.history.length > 1
-                                            ? window.history.back()
-                                            : (window.location.href = "/")
-                                    }
-                                >
-                                    Go Back
-                                </Button>
+                                />
 
-                                <Button
-                                    type="submit"
-                                    disabled={processing}
-                                    leftSection={
-                                        <IconUserPlus size={16} stroke={2.5} />
-                                    }
-                                >
-                                    Sign up
-                                </Button>
-                            </Group>
-                        </Stack>
+                                <Group justify="space-between">
+                                    <Button
+                                        variant="outline"
+                                        leftSection={
+                                            <IconArrowBackUp
+                                                size={16}
+                                                stroke={2.5}
+                                            />
+                                        }
+                                        onClick={() =>
+                                            window.history.length > 1
+                                                ? window.history.back()
+                                                : (window.location.href = "/")
+                                        }
+                                    >
+                                        Go Back
+                                    </Button>
+
+                                    <Button
+                                        type="submit"
+                                        disabled={processing}
+                                        leftSection={
+                                            <IconUserPlus
+                                                size={16}
+                                                stroke={2.5}
+                                            />
+                                        }
+                                    >
+                                        Sign up
+                                    </Button>
+                                </Group>
+                            </Grid.Col>
+                        </Grid>
                     </form>
                 </Stack>
 
