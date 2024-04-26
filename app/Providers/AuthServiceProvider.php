@@ -23,7 +23,8 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::before(function ($user, $ability) {
-            return $user->hasRole('super-admin');
+            // we have to return null if user is not super-admin so other before() closure could be run
+            return $user->hasRole('super-admin') ? true : null;
         });
     }
 }
