@@ -12,9 +12,9 @@ Laravel's breeze:react package rewritten with [Mantine](https://mantine.dev/) co
 
 ## Usage
 
-1. Clone this repo: https://github.com/rinma-e/adminpanel-react-laratrust
-2. Run `composer init`
-3. Run `npm install`
+1. Clone this repo,
+2. Run `composer init`,
+3. Run `npm install`.
 
 To start development server run `npm run dev`.
 
