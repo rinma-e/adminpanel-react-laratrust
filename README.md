@@ -154,6 +154,7 @@ Add this to `defineConfig` object:
 -   [x] Add roles and permissions to user array returned from User model.
 -   [x] Store links in to separate central file for easier access and modification.
 -   [x] Add role to links array so links could be shown/hidden based on roles (no role parameter defined or 'role:all' will show link to every user)
+-   [x] Activaded email verification feature.
 -   [ ] Create Admin panel for managing:
     -   [ ] users,
     -   [ ] roles,
