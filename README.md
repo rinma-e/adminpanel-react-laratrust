@@ -12,13 +12,46 @@ Laravel's breeze:react package rewritten with [Mantine](https://mantine.dev/) co
 
 ## Usage
 
+### Installation
+
 1. Clone this repo,
 2. Run `composer init`,
 3. Run `npm install`.
 
-To start development server run `npm run dev`.
+### Running development server
 
-To build assets run `npm run build`. To see your project with built assets don't run dev server, just open your browser and navigate to your project folder. Project is served with static assets so you can preview production project in localhost.
+To start development server run:
+
+    npm run dev
+
+### Building assets
+
+To build assets run:
+
+    npm run build
+
+### Previewing production
+
+To see your project with built assets don't run dev server, but depending on your enviroment:
+
+1. just open your browser and navigate to your project folder
+2. or run `artisan serve`
+
+Project is served with static assets so you can preview production project in localhost.
+
+### Testing features that require email verifications
+
+For testing that require email verifications in `.env` file make below changes:
+
+    MAIL_MAILER=log
+    MAIL_HOST=127.0.0.1
+    MAIL_PORT=2525
+
+This will send all emails to `log` file located in:
+
+    storage/logs/laravel.log
+
+Scroll at bottom of the file and find email. In email body find verification link which You can copy/past in browser.
 
 ## Important
 
