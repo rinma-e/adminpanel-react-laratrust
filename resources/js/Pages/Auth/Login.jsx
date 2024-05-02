@@ -62,7 +62,7 @@ export default function Login({ status, canResetPassword }) {
             <Head title="Log in" />
 
             <Stack w={420}>
-                {!status && (
+                {status && (
                     <Notification
                         icon={
                             <IconInfoCircle color="var(--mantine-color-green-6)" />
@@ -80,7 +80,7 @@ export default function Login({ status, canResetPassword }) {
                         }}
                     >
                         <Text c="green.6" size="sm" fw={500}>
-                            {status}aaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                            {status}
                         </Text>
                     </Notification>
                 )}

@@ -37,7 +37,7 @@ export default function VerifyEmail({ status }) {
             <Head title="Email Verification" />
 
             <Stack w={420}>
-                {status !== "verification-link-sent" && (
+                {status === "verification-link-sent" && (
                     <Notification
                         icon={
                             <IconInfoCircle color="var(--mantine-color-green-6)" />
