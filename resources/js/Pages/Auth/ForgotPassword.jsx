@@ -12,8 +12,9 @@ import {
     Stack,
     Card,
     useMantineColorScheme,
+    Notification,
 } from "@mantine/core";
-import { IconMail, IconArrowBackUp } from "@tabler/icons-react";
+import { IconMail, IconArrowBackUp, IconInfoCircle } from "@tabler/icons-react";
 
 export default function ForgotPassword({ status }) {
     const { colorScheme } = useMantineColorScheme();
@@ -39,71 +40,93 @@ export default function ForgotPassword({ status }) {
         <GuestLayout>
             <Head title="Forgot Password" />
 
-            {status && (
-                <Text c="green.6" align="center" my="md">
-                    {status}
-                </Text>
-            )}
-
-            <Card withBorder w={420} p="md" shadow="xs" radius="md">
-                <Stack>
-                    <Title
-                        mx="auto"
-                        my="sm"
-                        size="3rem"
-                        c={colorScheme === "dark" ? "dark.0" : "dark.4"}
-                        ta="center"
+            <Stack w={420}>
+                {status && (
+                    <Notification
+                        icon={
+                            <IconInfoCircle color="var(--mantine-color-green-6)" />
+                        }
+                        color="transparent"
+                        withBorder
+                        onClose={(e) =>
+                            (e.target.closest(
+                                ".mantine-Notification-root"
+                            ).style.display = "none")
+                        }
+                        mt={{ base: "xl", xs: 0 }}
+                        styles={{
+                            root: { boxShadow: "var(--mantine-shadow-xs)" },
+                        }}
                     >
-                        Forgot Password
-                    </Title>
+                        <Text c="green.6" size="sm" fw={500}>
+                            {status}
+                        </Text>
+                    </Notification>
+                )}
 
-                    <Divider size="xs" />
+                <Card withBorder p="md" shadow="xs" radius="md">
+                    <Stack>
+                        <Title
+                            mx="auto"
+                            my="sm"
+                            size="3rem"
+                            c={colorScheme === "dark" ? "dark.0" : "dark.4"}
+                            ta="center"
+                        >
+                            Forgot Password
+                        </Title>
 
-                    <Text align="center" size="sm">
-                        Forgot your password? No problem. Just let us know your
-                        email address and we will email you a password reset
-                        link that will allow you to choose a new one.
-                    </Text>
+                        <Divider size="xs" />
 
-                    <form onSubmit={form.onSubmit(handleSubmit)}>
-                        <TextInput
-                            label="Email"
-                            name="email"
-                            autoComplete="email"
-                            mb="lg"
-                            size="sm"
-                            withAsterisk={false}
-                            required
-                            {...form.getInputProps("email")}
-                        />
+                        <Text align="center" size="sm">
+                            Forgot your password? No problem. Just let us know
+                            your email address and we will email you a password
+                            reset link that will allow you to choose a new one.
+                        </Text>
 
-                        <Group justify="space-between">
-                            <Button
-                                variant="outline"
-                                leftSection={
-                                    <IconArrowBackUp size={16} stroke={2.5} />
-                                }
-                                onClick={() =>
-                                    window.history.length > 1
-                                        ? window.history.back()
-                                        : (window.location.href = "/")
-                                }
-                            >
-                                Home
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                leftSection={
-                                    <IconMail size={16} stroke={2.5} />
-                                }
-                            >
-                                Email Password Reset Link
-                            </Button>
-                        </Group>
-                    </form>
-                </Stack>
-            </Card>
+                        <form onSubmit={form.onSubmit(handleSubmit)}>
+                            <TextInput
+                                label="Email"
+                                name="email"
+                                autoComplete="email"
+                                mb="lg"
+                                size="sm"
+                                withAsterisk={false}
+                                required
+                                {...form.getInputProps("email")}
+                            />
+
+                            <Group justify="space-between">
+                                <Button
+                                    variant="outline"
+                                    leftSection={
+                                        <IconArrowBackUp
+                                            size={16}
+                                            stroke={2.5}
+                                        />
+                                    }
+                                    onClick={() =>
+                                        window.history.length > 1
+                                            ? window.history.back()
+                                            : (window.location.href = "/")
+                                    }
+                                >
+                                    Home
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    leftSection={
+                                        <IconMail size={16} stroke={2.5} />
+                                    }
+                                >
+                                    Email Password Reset Link
+                                </Button>
+                            </Group>
+                        </form>
+                    </Stack>
+                </Card>
+            </Stack>
         </GuestLayout>
     );
 }

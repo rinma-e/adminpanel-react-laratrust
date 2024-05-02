@@ -15,8 +15,13 @@ import {
     Stack,
     Card,
     useMantineColorScheme,
+    Notification,
 } from "@mantine/core";
-import { IconLogin2, IconArrowBackUp } from "@tabler/icons-react";
+import {
+    IconLogin2,
+    IconArrowBackUp,
+    IconInfoCircle,
+} from "@tabler/icons-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 
 import GuestLayout from "@/Layouts/GuestLayout";
@@ -56,135 +61,160 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <Head title="Log in" />
 
-            <Card withBorder w={420} p="md" shadow="xs" radius="md">
-                <Stack>
-                    {status && (
-                        <Text c="green.6" align="center" mt="md">
-                            {status}
+            <Stack w={420}>
+                {!status && (
+                    <Notification
+                        icon={
+                            <IconInfoCircle color="var(--mantine-color-green-6)" />
+                        }
+                        color="transparent"
+                        withBorder
+                        onClose={(e) =>
+                            (e.target.closest(
+                                ".mantine-Notification-root"
+                            ).style.display = "none")
+                        }
+                        mt={{ base: "xl", xs: 0 }}
+                        styles={{
+                            root: { boxShadow: "var(--mantine-shadow-xs)" },
+                        }}
+                    >
+                        <Text c="green.6" size="sm" fw={500}>
+                            {status}aaaaaaaaaaaaaaaaaaaaaaaaaaaa
                         </Text>
-                    )}
+                    </Notification>
+                )}
 
-                    <Title
-                        mx="auto"
-                        my="sm"
-                        size="3rem"
-                        c={colorScheme === "dark" ? "dark.0" : "dark.4"}
-                    >
-                        Log in
-                    </Title>
-
-                    <Divider size="xs" />
-
-                    <form onSubmit={form.onSubmit(handleSubmit)}>
-                        {credentialsError && (
-                            <Text
-                                c="red.6"
-                                size="sm"
-                                fw={500}
-                                align="center"
-                                my="sm"
-                            >
-                                {credentialsError}
-                            </Text>
-                        )}
-
-                        <TextInput
-                            label="Email"
-                            name="email"
-                            autoComplete="email"
-                            mb="md"
-                            size="sm"
-                            withAsterisk={false}
-                            required
-                            {...form.getInputProps("email")}
-                        />
-
-                        <PasswordInput
-                            label={
-                                <Group justify="space-between" wrap="nowrap">
-                                    Password
-                                    {canResetPassword && (
-                                        <Anchor
-                                            component={Link}
-                                            href={route("password.request")}
-                                            size="xs"
-                                        >
-                                            Forgot password?
-                                        </Anchor>
-                                    )}
-                                </Group>
-                            }
-                            labelProps={{ display: "block" }}
-                            withAsterisk={false}
-                            visible={visible}
-                            onVisibilityChange={toggle}
-                            size="sm"
-                            mb="lg"
-                            required
-                            {...form.getInputProps("password")}
-                        />
-
-                        <Checkbox
-                            label="Remember me"
-                            fw="500"
-                            mb="xl"
-                            {...form.getInputProps("remember", {
-                                type: "checkbox",
-                            })}
-                        />
-
-                        <Group justify="space-between">
-                            <Button
-                                variant="outline"
-                                leftSection={
-                                    <IconArrowBackUp size={16} stroke={2.5} />
-                                }
-                                onClick={() =>
-                                    window.history.length > 1
-                                        ? window.history.back()
-                                        : (window.location.href = "/")
-                                }
-                            >
-                                Go Back
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                leftSection={
-                                    <IconLogin2 size={16} stroke={2.5} />
-                                }
-                            >
-                                Log in
-                            </Button>
-                        </Group>
-                    </form>
-                </Stack>
-
-                <Card.Section
-                    withBorder
-                    mt="md"
-                    bg={colorScheme === "dark" ? "gray.8" : "gray.0"}
-                >
-                    <Group
-                        w="full"
-                        p="lg"
-                        align="center"
-                        justify="center"
-                        gap="xs"
-                    >
-                        <Text size="sm">Don't have an account?</Text>
-
-                        <Anchor
-                            component={Link}
-                            href={route("register")}
-                            size="sm"
-                            fw={700}
+                <Card withBorder p="md" shadow="xs" radius="md">
+                    <Stack>
+                        <Title
+                            mx="auto"
+                            my="sm"
+                            size="3rem"
+                            c={colorScheme === "dark" ? "dark.0" : "dark.4"}
                         >
-                            Sign up here
-                        </Anchor>
-                    </Group>
-                </Card.Section>
-            </Card>
+                            Log in
+                        </Title>
+
+                        <Divider size="xs" />
+
+                        <form onSubmit={form.onSubmit(handleSubmit)}>
+                            {credentialsError && (
+                                <Text
+                                    c="red.6"
+                                    size="sm"
+                                    fw={500}
+                                    align="center"
+                                    my="sm"
+                                >
+                                    {credentialsError}
+                                </Text>
+                            )}
+
+                            <TextInput
+                                label="Email"
+                                name="email"
+                                autoComplete="email"
+                                mb="md"
+                                size="sm"
+                                withAsterisk={false}
+                                required
+                                {...form.getInputProps("email")}
+                            />
+
+                            <PasswordInput
+                                label={
+                                    <Group
+                                        justify="space-between"
+                                        wrap="nowrap"
+                                    >
+                                        Password
+                                        {canResetPassword && (
+                                            <Anchor
+                                                component={Link}
+                                                href={route("password.request")}
+                                                size="xs"
+                                            >
+                                                Forgot password?
+                                            </Anchor>
+                                        )}
+                                    </Group>
+                                }
+                                labelProps={{ display: "block" }}
+                                withAsterisk={false}
+                                visible={visible}
+                                onVisibilityChange={toggle}
+                                size="sm"
+                                mb="lg"
+                                required
+                                {...form.getInputProps("password")}
+                            />
+
+                            <Checkbox
+                                label="Remember me"
+                                fw="500"
+                                mb="xl"
+                                {...form.getInputProps("remember", {
+                                    type: "checkbox",
+                                })}
+                            />
+
+                            <Group justify="space-between">
+                                <Button
+                                    variant="outline"
+                                    leftSection={
+                                        <IconArrowBackUp
+                                            size={16}
+                                            stroke={2.5}
+                                        />
+                                    }
+                                    onClick={() =>
+                                        window.history.length > 1
+                                            ? window.history.back()
+                                            : (window.location.href = "/")
+                                    }
+                                >
+                                    Go Back
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    leftSection={
+                                        <IconLogin2 size={16} stroke={2.5} />
+                                    }
+                                >
+                                    Log in
+                                </Button>
+                            </Group>
+                        </form>
+                    </Stack>
+
+                    <Card.Section
+                        withBorder
+                        mt="md"
+                        bg={colorScheme === "dark" ? "gray.8" : "gray.0"}
+                    >
+                        <Group
+                            w="full"
+                            p="lg"
+                            align="center"
+                            justify="center"
+                            gap="xs"
+                        >
+                            <Text size="sm">Don't have an account?</Text>
+
+                            <Anchor
+                                component={Link}
+                                href={route("register")}
+                                size="sm"
+                                fw={700}
+                            >
+                                Sign up here
+                            </Anchor>
+                        </Group>
+                    </Card.Section>
+                </Card>
+            </Stack>
         </GuestLayout>
     );
 }
