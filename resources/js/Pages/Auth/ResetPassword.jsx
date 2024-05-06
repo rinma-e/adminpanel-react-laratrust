@@ -39,7 +39,7 @@ export default function ResetPassword({ token, email }) {
 
     const handleSubmit = (data) => {
         router.post(route("password.store"), data, {
-            onProgress: () => setProcessing(true),
+            onStart: () => setProcessing(true),
             onFinish: () => setProcessing(false),
             onError: (err) => {
                 // set server side errors in form

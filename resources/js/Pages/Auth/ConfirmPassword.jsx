@@ -35,7 +35,7 @@ export default function ConfirmPassword() {
 
     const handleSubmit = (data) => {
         router.post(route("password.confirm"), data, {
-            onProgress: () => setProcessing(true),
+            onStart: () => setProcessing(true),
             onFinish: () => setProcessing(false),
             onError: (err) => {
                 form.setErrors({ ...err });

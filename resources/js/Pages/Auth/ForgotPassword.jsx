@@ -28,7 +28,7 @@ export default function ForgotPassword({ status }) {
 
     const handleSubmit = (data) => {
         router.post(route("password.email"), data, {
-            onProgress: () => setProcessing(true),
+            onStart: () => setProcessing(true),
             onFinish: () => setProcessing(false),
             onError: (err) => {
                 form.setErrors({ ...err });

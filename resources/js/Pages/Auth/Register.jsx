@@ -50,7 +50,7 @@ export default function Register() {
 
     const handleSubmit = (data) => {
         router.post(route("register"), data, {
-            onProgress: () => setProcessing(true),
+            onStart: () => setProcessing(true),
             onFinish: () => setProcessing(false),
             onError: (err) => {
                 // set server side errors in form

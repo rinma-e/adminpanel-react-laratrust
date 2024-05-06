@@ -46,7 +46,7 @@ export default function Login({ status, canResetPassword }) {
 
     const handleSubmit = (data) => {
         router.post(route("login"), data, {
-            onProgress: () => setProcessing(true),
+            onStart: () => setProcessing(true),
             onFinish: () => setProcessing(false),
             onError: (err) => {
                 form.setErrors({ ...err });

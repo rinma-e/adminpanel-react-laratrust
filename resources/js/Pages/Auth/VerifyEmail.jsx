@@ -24,7 +24,7 @@ export default function VerifyEmail({ status }) {
 
     const handleSubmit = (data) => {
         router.post(route("verification.send"), data, {
-            onProgress: () => setProcessing(true),
+            onStart: () => setProcessing(true),
             onFinish: () => setProcessing(false),
             onError: (err) => {
                 console.log(err);
