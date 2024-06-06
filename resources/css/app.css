@@ -14,6 +14,8 @@
 @import "@mantine/spotlight/styles.layer.css";
 @import "@mantine/nprogress/styles.layer.css";
 
+@import "mantine-datatable/styles.layer.css";
+
 @layer tw_base {
     @tailwind base;
 }
@@ -195,7 +197,8 @@
    but tailwind base styles do set, so for mantine focus ring to show properly
    we need to set box-shadow to none for all inputs.
    Tailwind classes when applied will show focus ring correctly */
-input:focus {
+input:focus,
+textarea:focus {
     box-shadow: none;
 }
 
